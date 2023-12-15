@@ -65,7 +65,7 @@ def main():
         
         # Parse and get HTML node
         tree = etree.HTML(page)
-        node = tree.xpath('//*[@id="att-list"]')[0]
+        node = tree.xpath(f'//*[@id="{ATT_LIST_HTML_ID}"]')[0]
         
         # Delete content
         for child in node.getchildren():
