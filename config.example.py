@@ -15,3 +15,6 @@ OUTPUT_FILES = ["/var/www/index.html", "/var/www/index_en.html"]
 
 # HTML ID of the ul or ol element that should be populated with li children for the attendees
 ATT_LIST_HTML_ID = "att-list"
+
+# Numerical ID of the question in pretix that asks the user for consent to be listed publicly on the website
+CONSENT_QUESTION_ID = 1

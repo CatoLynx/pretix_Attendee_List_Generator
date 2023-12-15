@@ -34,7 +34,7 @@ def main():
         for position in positions:
             answered = False
             for answer in position['answers']:
-                if answer['question'] == 5:
+                if answer['question'] == CONSENT_QUESTION_ID:
                     answered = True
                     if answer['answer'] == "True":
                         att_list.append(position['attendee_name'])
