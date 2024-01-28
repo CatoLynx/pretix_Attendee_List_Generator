@@ -40,35 +40,55 @@ def main():
             # Skip non-paid orders
             if order['status'] != 'p':
                 continue
+            
             positions = order['positions']
             for position in positions:
                 if position.get('attendee_name') is None:
                     continue
+                
+                att_list_entry = {'name': None, 'fursuiter': None}
+                addons = [pos for pos in positions if pos.get('addon_to') == position['id']]
+                
+                for addon in addons:
+                    if addon['item'] == FURSUITER_ITEM_ID:
+                        if addon['variation'] == FURSUITER_FULL_VARIATION_ID:
+                            att_list_entry['fursuiter'] = 'full'
+                        elif addon['variation'] == FURSUITER_PARTIAL_VARIATION_ID:
+                            att_list_entry['fursuiter'] = 'partial'
+                
                 answered = False
                 for answer in position['answers']:
                     if answer['question'] == CONSENT_QUESTION_ID:
                         answered = True
                         if answer['answer'] == "True":
-                            att_list.append(position['attendee_name'])
+                            att_list_entry['name'] = position['attendee_name']
+                            print(att_list_entry)
+                            att_list.append(att_list_entry.copy())
                         else:
                             att_list_no_consent.append(position['attendee_name'])
                 if not answered:
                     att_list_no_consent.append(position['attendee_name'])
     
     if not att_list:
-        att_list = ["..."]
+        att_list = [{'name': "...", 'fursuiter': None}]
     
     def _sortfun(s):
         # Strip accents, then casefold
         return ''.join(c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn').casefold()
     
-    att_list.sort(key=_sortfun)
+    att_list.sort(key=lambda e: _sortfun(e['name']))
     att_list_no_consent.sort(key=_sortfun)
 
     print("\n\nAttendee List:")
     for attendee in att_list:
-        print("  " + attendee)
+        if attendee['fursuiter'] == 'full':
+            fursuit_tag = "[F]"
+        elif attendee['fursuiter'] == 'partial':
+            fursuit_tag = "[P] "
+        else:
+            fursuit_tag = "[ ]"
+        print("  " + fursuit_tag, attendee['name'])
     
     print("\n\nNo consent:")
     for attendee in att_list_no_consent:
@@ -89,8 +109,14 @@ def main():
             node.remove(child)
         
         # Add new content
-        for att_name in att_list:
-            content = fragment_fromstring(f"<li>{att_name}</li>")
+        for att_data in att_list:
+            if att_data['fursuiter'] == 'full':
+                fursuit_tag = "[F]"
+            elif att_data['fursuiter'] == 'partial':
+                fursuit_tag = "[P] "
+            else:
+                fursuit_tag = "[ ]"
+            content = fragment_fromstring(f"<li>{fursuit_tag} {att_data['name']}</li>")
             node.append(content)
         
         # Write file
