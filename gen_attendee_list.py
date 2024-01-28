@@ -37,8 +37,8 @@ def main():
         orders = data['results']
 
         for order in orders:
-            # Skip non-paid orders
-            if order['status'] != 'p':
+            # Skip non-paid orders if desired
+            if SHOW_ONLY_PAID_ORDERS and order['status'] != 'p':
                 continue
             
             positions = order['positions']

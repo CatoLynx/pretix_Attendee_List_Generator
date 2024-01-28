@@ -25,3 +25,6 @@ FURSUITER_ITEM_ID = 2
 # Numerical IDs of the product variants in pretix equivalent to fursuit variants
 FURSUITER_FULL_VARIATION_ID = 1
 FURSUITER_PARTIAL_VARIATION_ID = 2
+
+# Whether to show only paid orders or all orders
+SHOW_ONLY_PAID_ORDERS = False
