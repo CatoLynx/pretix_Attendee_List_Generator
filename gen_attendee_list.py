@@ -1,4 +1,5 @@
 import requests
+import unicodedata
 from lxml import etree
 from lxml.html import fragment_fromstring
 
@@ -41,6 +42,8 @@ def main():
                 continue
             positions = order['positions']
             for position in positions:
+                if position.get('attendee_name') is None:
+                    continue
                 answered = False
                 for answer in position['answers']:
                     if answer['question'] == CONSENT_QUESTION_ID:
@@ -55,15 +58,20 @@ def main():
     if not att_list:
         att_list = ["..."]
     
-    att_list.sort(key=str.casefold)
-    att_list_no_consent.sort(key=str.casefold)
+    def _sortfun(s):
+        # Strip accents, then casefold
+        return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn').casefold()
+    
+    att_list.sort(key=_sortfun)
+    att_list_no_consent.sort(key=_sortfun)
 
     print("\n\nAttendee List:")
-    for attendee in sorted(att_list, key=str.casefold):
+    for attendee in att_list:
         print("  " + attendee)
     
     print("\n\nNo consent:")
-    for attendee in sorted(att_list_no_consent, key=str.casefold):
+    for attendee in att_list_no_consent:
         print("  " + attendee)
     
     print("\n\nUpdating HTML files")
