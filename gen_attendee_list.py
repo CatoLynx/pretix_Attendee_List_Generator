@@ -37,6 +37,10 @@ def main():
         orders = data['results']
 
         for order in orders:
+            # Skip cancelled orders
+            if order['status'] == 'c':
+                continue
+            
             # Skip non-paid orders if desired
             if SHOW_ONLY_PAID_ORDERS and order['status'] != 'p':
                 continue
@@ -62,7 +66,7 @@ def main():
                         answered = True
                         if answer['answer'] == "True":
                             att_list_entry['name'] = position['attendee_name']
-                            print(att_list_entry)
+                            #print(att_list_entry)
                             att_list.append(att_list_entry.copy())
                         else:
                             att_list_no_consent.append(position['attendee_name'])
