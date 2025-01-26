@@ -16,6 +16,12 @@ OUTPUT_FILES = ["/var/www/index.html", "/var/www/index_en.html"]
 # HTML ID of the ul or ol element that should be populated with li children for the attendees
 ATT_LIST_HTML_ID = "att-list"
 
+# HTML ID of the element that informs the user of the waiting list if all tickets are sold. Gets set to invisible otherwise. (None if unused)
+WAITING_LIST_INFO_HTML_ID = "waiting-list-info"
+
+# HTML ID of the element that should be populated with the number of people on the waiting list (None if unused)
+WAITING_LIST_COUNT_HTML_ID = "waiting-list-count"
+
 # Numerical ID of the question in pretix that asks the user for consent to be listed publicly on the website
 CONSENT_QUESTION_ID = 1
 

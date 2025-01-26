@@ -23,6 +23,24 @@ def main():
     att_list = []
     att_list_no_consent = []
     
+    print("Getting waiting list entries")
+    data = {'next': f"organizers/{ORGANIZER}/events/{EVENT}/waitinglistentries"}
+    
+    waiting_list_count = 0
+    while data['next']:
+        print(f"  Querying {data['next']}")
+        resp = api_call(data['next'])
+        if resp.status_code != 200:
+            print(f"  Error: HTTP status code {resp.status_code}")
+            return
+        
+        data = resp.json()
+        entries = data['results']
+
+        for entry in entries:
+            if entry['voucher'] is None:
+                waiting_list_count += 1
+    
     print("Getting orders")
     data = {'next': f"organizers/{ORGANIZER}/events/{EVENT}/orders"}
     
@@ -84,6 +102,8 @@ def main():
     att_list.sort(key=lambda e: _sortfun(e['name']))
     att_list_no_consent.sort(key=_sortfun)
 
+    print(f"\n\nWaiting list count: {waiting_list_count}")
+
     print("\n\nAttendee List:")
     for attendee in att_list:
         if attendee['fursuiter'] == 'full':
@@ -104,7 +124,7 @@ def main():
         with open(filename, 'r') as f:
             page = f.read()
         
-        # Parse and get HTML node
+        # Parse and get attendee list HTML node
         tree = etree.HTML(page)
         node = tree.xpath(f'//*[@id="{ATT_LIST_HTML_ID}"]')[0]
         
@@ -122,6 +142,20 @@ def main():
                 fursuit_tag = "[ ]"
             content = fragment_fromstring(f"<li>{fursuit_tag} {att_data['name']}</li>")
             node.append(content)
+        
+        if WAITING_LIST_INFO_HTML_ID is not None:
+            # Parse and get waiting list info HTML node
+            node = tree.xpath(f'//*[@id="{WAITING_LIST_INFO_HTML_ID}"]')[0]
+            
+            # Set visibility
+            node.set('style', '' if waiting_list_count > 0 else 'display: none;')
+        
+        if WAITING_LIST_COUNT_HTML_ID is not None:
+            # Parse and get waiting list count HTML node
+            node = tree.xpath(f'//*[@id="{WAITING_LIST_COUNT_HTML_ID}"]')[0]
+            
+            # Set content
+            node.text = str(waiting_list_count)
         
         # Write file
         with open(filename, 'wb') as f:
