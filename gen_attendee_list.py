@@ -118,6 +118,10 @@ def main():
     for attendee in att_list_no_consent:
         print("  " + attendee)
     
+    att_list_combined = sorted([e['name'] for e in att_list] + att_list_no_consent, key=_sortfun)
+    with open("attendee_list_combined.txt", 'w') as f:
+        f.write("\n".join(att_list_combined))
+    
     print("\n\nUpdating HTML files")
     for filename in OUTPUT_FILES:
         # Read file
